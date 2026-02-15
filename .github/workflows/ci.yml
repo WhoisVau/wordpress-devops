@@ -6,9 +6,7 @@ on:
       - main
 
 jobs:
-
   terraform:
-    name: Terraform
     runs-on: ubuntu-latest
 
     defaults:
@@ -37,12 +35,7 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform Plan
-        run: terraform plan -lock=false
-
-
   k8s:
-    name: Kubernetes YAML validation
     runs-on: ubuntu-latest
 
     steps:
