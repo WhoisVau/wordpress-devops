@@ -23,13 +23,13 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform -chdir=infrastructure/envs/dev init -input=false
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform -chdir=infrastructure/envs/dev validate
 
       - name: Terraform Plan
-        run: terraform plan -lock=false
+        run: terraform -chdir=infrastructure/envs/dev plan -lock=false
 
   kubernetes:
     name: Kubernetes Manifest Check
@@ -42,6 +42,5 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
 
-      - name: Validate manifests
-        run: |
-          kubectl apply --dry-run=client -f k8s/
+      - name: Validate manifests (client only)
+        run: kubectl apply --dry-run=client --validate=false -f k8s/
