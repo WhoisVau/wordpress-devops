@@ -1,4 +1,4 @@
-name: Dev CI Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -16,31 +16,33 @@ jobs:
         working-directory: infrastructure/envs/dev
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
       - name: Terraform Init
-        run: terraform -chdir=infrastructure/envs/dev init -input=false
+        run: terraform init -input=false
 
       - name: Terraform Validate
-        run: terraform -chdir=infrastructure/envs/dev validate
+        run: terraform validate
 
       - name: Terraform Plan
-        run: terraform -chdir=infrastructure/envs/dev plan -lock=false
+        run: terraform plan -lock=false
 
   kubernetes:
     name: Kubernetes Manifest Check
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+      - name: Install yamllint
+        run: sudo apt-get update && sudo apt-get install -y yamllint
 
-      - name: Validate manifests (client only)
-        run: kubectl apply --dry-run=client --validate=false -f k8s/
+      - name: Validate Kubernetes YAML files
+        run: yamllint k8s/
