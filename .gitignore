@@ -1,0 +1,22 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+terraform.tfvars
+.terraform.lock.hcl
+
+# Kuber
+*.secret.yaml
+
+# Linux
+.DS_Store
+
+# VsCode
+.vscode/
+
+# Env files
+.env
+.env.*

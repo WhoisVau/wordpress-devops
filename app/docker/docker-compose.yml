@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: wp-app
+    ports:
+      - "8081:80"
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp
+      WORDPRESS_DB_NAME: wp
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    image: mysql:8
+    container_name: wp-mysql
+    environment:
+      MYSQL_DATABASE: wp
+      MYSQL_USER: wp
+      MYSQL_PASSWORD: wp
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    container_name: wp-redis
+
+volumes:
+  mysql_data:
