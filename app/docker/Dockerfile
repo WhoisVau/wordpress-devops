@@ -1,10 +1,5 @@
-FROM wordpress:6.4-php8.2-apache
+FROM wordpress:6.4-apache
 
-# Устанавливаем Redis extension
-RUN pecl install redis \
-    && docker-php-ext-enable redis
-
-# Копируем wp-config
-COPY app/wp-config.php /var/www/html/wp-config.php
+RUN pecl install redis && docker-php-ext-enable redis
 
 RUN chown -R www-data:www-data /var/www/html

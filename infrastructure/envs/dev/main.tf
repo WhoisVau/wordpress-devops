@@ -57,3 +57,16 @@ module "redis" {
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
 }
+
+resource "aws_ecr_repository" "wordpress" {
+  name = "wordpress-dev"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Environment = "dev"
+    Project     = "wordpress"
+  }
+}
