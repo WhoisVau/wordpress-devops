@@ -27,4 +27,3 @@ spec:
                 name: wordpress
                 port:
                   number: 80
-                  
