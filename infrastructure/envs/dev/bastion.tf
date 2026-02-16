@@ -1,6 +1,6 @@
 resource "aws_key_pair" "bastion" {
   key_name   = "wordpress-dev-bastion-key"
-  public_key = file("~/.ssh/wordpress-dev-bastion.pub")
+  public_key = file("${path.module}/../../keys/wordpress-dev-bastion.pub")
 }
 
 data "aws_ami" "amazon_linux" {
