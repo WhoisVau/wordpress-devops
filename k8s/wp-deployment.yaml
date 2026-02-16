@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -34,16 +33,18 @@ spec:
                       operator: In
                       values:
                         - wordpress
-                topologyKey: "kubernetes.io/hostname"
+                topologyKey: kubernetes.io/hostname
 
       containers:
         - name: wordpress
-          image: 899239686730.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:INITIAL
+          image: 899239686730.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:latest
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 80
 
           env:
+            # ---------- Redis ----------
             - name: REDIS_HOST
               value: "redis"
 
@@ -61,6 +62,7 @@ spec:
             - name: PHP_SESSION_SAVE_PATH
               value: "tcp://redis:6379"
 
+            # ---------- Database ----------
             - name: WORDPRESS_DB_HOST
               valueFrom:
                 secretKeyRef:
@@ -97,7 +99,7 @@ spec:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 15
+            initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
@@ -106,7 +108,7 @@ spec:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 30
+            initialDelaySeconds: 40
             periodSeconds: 20
             timeoutSeconds: 5
             failureThreshold: 3

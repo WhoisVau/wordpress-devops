@@ -54,17 +54,17 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t wordpress-dev:${{ github.sha }} -f app/docker/Dockerfile ./app
+          docker build -t wordpress-dev:latest -f app/docker/Dockerfile ./app
 
       - name: Tag Docker image
         run: |
-          docker tag wordpress-dev:${{ github.sha }} \
-          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:${{ github.sha }}
+          docker tag wordpress-dev:latest \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:latest
 
       - name: Push Docker image
         run: |
           docker push \
-          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:${{ github.sha }}
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:latest
 
 
   deploy:
@@ -87,11 +87,9 @@ jobs:
             --region eu-central-1 \
             --name wordpress-dev-eks
 
-      - name: Update Kubernetes image
+      - name: Restart deployment
         run: |
-          kubectl set image deployment/wordpress \
-          wordpress=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:${{ github.sha }} \
-          -n wordpress
+          kubectl rollout restart deployment/wordpress -n wordpress
 
       - name: Wait for rollout
         run: |
