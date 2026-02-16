@@ -1,0 +1,19 @@
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "wordpress-dev-alb-controller-role",
+        "RoleId": "AROA5CXW4WJFE4VPVANWW",
+        "Arn": "arn:aws:iam::899239686730:role/wordpress-dev-alb-controller-role",
+        "CreateDate": "2026-02-14T06:49:42+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Federated": "arn:aws:iam::899239686730:oidc-provider/oidc.eks.eu-central-1.amazonaws.com/id/F9920B5961EE842868166C4CA2188F5C"
+                    },
+                    "Action": "sts:AssumeRoleWithWebIdentity",
+                    "Condition": {
+                        "StringEquals": {
+                            "oidc.eks.eu-central-1.amazonaws.com/id/F9920B5961EE842868166C4CA2188F5C:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller"

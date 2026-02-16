@@ -65,18 +65,24 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t wordpress-dev -f app/docker/Dockerfile ./app
+          ddocker build -t wordpress-dev:${{ github.sha }} -f app/docker/Dockerfile ./app
 
       - name: Tag Docker image
         run: |
-          docker tag wordpress-dev:latest \
-          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:latest
+          docker tag wordpress-dev:${{ github.sha }} \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:${{ github.sha }}
 
       - name: Push Docker image
         run: |
           docker push \
-          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:latest
+          docker push \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:${{ github.sha }}
 
+      - name: Update Kubernetes image
+        run: |
+          kubectl set image deployment/wordpress \
+          wordpress=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:${{ github.sha }} \
+          -n wordpress
   deploy:
     name: Deploy to EKS
     runs-on: ubuntu-latest

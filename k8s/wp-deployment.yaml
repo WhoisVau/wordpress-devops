@@ -6,45 +6,107 @@ metadata:
   namespace: wordpress
 spec:
   replicas: 2
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
   selector:
     matchLabels:
       app: wordpress
+
   template:
     metadata:
       labels:
         app: wordpress
+
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - wordpress
+                topologyKey: "kubernetes.io/hostname"
+
       containers:
         - name: wordpress
-          image: wordpress:6.4-apache
+          image: 899239686730.dkr.ecr.eu-central-1.amazonaws.com/wordpress-dev:INITIAL
+
           ports:
             - containerPort: 80
-          envFrom:
-            - secretRef:
-                name: wordpress-secrets
+
           env:
-            - name: WORDPRESS_REDIS_HOST
-              value: "<REDIS_ENDPOINT>"
+            - name: REDIS_HOST
+              value: "redis"
+
+            - name: REDIS_PORT
+              value: "6379"
+
+            - name: WORDPRESS_CONFIG_EXTRA
+              value: |
+                define('WP_REDIS_HOST', 'redis');
+                define('WP_REDIS_PORT', 6379);
+
+            - name: PHP_SESSION_SAVE_HANDLER
+              value: "redis"
+
+            - name: PHP_SESSION_SAVE_PATH
+              value: "tcp://redis:6379"
+
+            - name: WORDPRESS_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: wordpress-secrets
+                  key: WORDPRESS_DB_HOST
+
+            - name: WORDPRESS_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: wordpress-secrets
+                  key: WORDPRESS_DB_NAME
+
+            - name: WORDPRESS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: wordpress-secrets
+                  key: WORDPRESS_DB_USER
+
+            - name: WORDPRESS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wordpress-secrets
+                  key: WORDPRESS_DB_PASSWORD
+
           resources:
             requests:
-              cpu: 200m
-              memory: 256Mi
+              cpu: "200m"
+              memory: "256Mi"
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: "500m"
+              memory: "512Mi"
+
           readinessProbe:
             httpGet:
               path: /
               port: 80
             initialDelaySeconds: 15
             periodSeconds: 10
-            timeoutSeconds: 3
+            timeoutSeconds: 5
             failureThreshold: 3
+
           livenessProbe:
             httpGet:
               path: /
               port: 80
             initialDelaySeconds: 30
-            periodSeconds: 15
+            periodSeconds: 20
             timeoutSeconds: 5
-            failureThreshold: 5
+            failureThreshold: 3
